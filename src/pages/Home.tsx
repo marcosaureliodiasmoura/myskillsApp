@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList} from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, Platform } from 'react-native';
 
 import { Button } from '../components/Button';
 import { SkillCard } from '../components/SkillCard';
 
-interface SkillData{
+interface SkillData {
   id: string;
   name: string;
   date?: Date;
@@ -15,13 +15,20 @@ export function Home() {
   const [mySkills, setMySkills] = useState<SkillData[]>([]);
 
   function handleAddNewSkill() {
-    const data ={ //Criamos um objeto ao invés de adicionar texto.
+    const data = { //Criamos um objeto ao invés de adicionar texto.
       id: String(new Date().getTime()),
       name: newSkill
     }
-
     setMySkills(oldState => [...oldState, data]);
   }
+
+    //Para remover a skill vamos pegar o ID que é uma string
+    function handleRemoveSkill(id: string){
+      setMySkills(oldState => oldState.filter(
+        skill => skill.id !== id
+      ));
+    }
+
 
   return (
     <View style={styles.container}>
@@ -36,19 +43,25 @@ export function Home() {
         onChangeText={setNewSkill}
       />
 
-     <Button onPress={handleAddNewSkill}/>
+      <Button
+        title="Add"
+        onPress={handleAddNewSkill}
+      />
 
       <Text style={[styles.title, { marginVertical: 50 }]}>
         My skills
      </Text>
 
-     <FlatList 
-     data={mySkills}
-     keyExtractor={item => item.id}
-     renderItem={({ item}) => (
-       <SkillCard skill={item.name}/>
-     )}
-     />
+      <FlatList
+        data={mySkills}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <SkillCard 
+          skill={item.name}
+          onPress={() => handleRemoveSkill(item.id)}
+          />
+        )}
+      />
 
     </View>
   )
@@ -58,7 +71,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121015',
-    paddingHorizontal: 20,
     paddingVertical: 70,
     paddingHorizontal: 30
   },
